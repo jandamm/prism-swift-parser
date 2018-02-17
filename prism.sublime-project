@@ -1,0 +1,39 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "Test",
+			"shell_cmd": "npm run build"
+		}
+	],
+	"folders":
+	[
+		{
+			"folder_exclude_patterns":
+			[
+				"*"
+			],
+			"name": "project",
+			"path": "."
+		},
+		{
+			"path": "src"
+		},
+		{
+			"path": "helper"
+		},
+		{
+			"file_exclude_patterns":
+			[
+				".gitkeep"
+			],
+			"path": "test"
+		},
+		{
+			"path": "templates"
+		},
+		{
+			"path": "node_modules/prismjs"
+		}
+	]
+}

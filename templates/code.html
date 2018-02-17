@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="../product/swift.css">
+		<style type="text/css">code{tab-size:4;}</style>
+	</head>
+	<body>
+				<pre><code class="language-swift">
+import UIKit
+
+protocol X {}
+
+// some comment
+/// doc
+public struct SafeZip2Sequence&lt;Sequence1: Sequence, Sequence2&gt;: X {
+	fileprivate let sequence1: Sequence1
+	fileprivate let sequence2: Sequence2
+}
+</code></pre><pre><code class="language-swift">
+protocol Sequence {
+	associatedtype Element where Self.Element == Self.Iterator.Element
+	associatedtype Iterator: IteratorProtocol
+	func makeIterator() -&gt; Self.Iterator
+}
+</code></pre><pre><code class="language-swift">
+extension SafeZip2Sequence: Sequence {
+	public struct Iterator {
+		fileprivate var iterator1: Sequence1.Iterator
+		fileprivate var iterator2: Sequence2.Iterator
+	}
+}
+</code></pre><pre><code class="language-swift">
+extension SafeZip2Sequence: Sequence {
+	public func makeIterator() -&gt; Iterator {
+		return Iterator(iterator1: sequence1.makeIterator(), iterator2: sequence2.makeIterator)
+	}
+}
+</code></pre><pre><code class="language-swift">
+extension SafeZip2Sequence: Sequence {
+	public enum Element {
+		case pair(first: Sequence1.Element, second: Sequence2.Element)
+		case first(Sequence1.Element)
+		case second(Sequence2.Element)
+  	}
+}
+</code></pre><pre><code class="language-swift">		
+extension SafeZip2Sequence.Iterator: IteratorProtocol {
+	public mutating func next() -&gt; SafeZip2Sequence.Element? {
+		let value1 = iterator1.next()
+		let value2 = iterator2.Next()
+		return Element(first: value1, second: value2)
+	}
+}
+</code></pre><pre><code class="language-swift">
+fileprivate extension SafeZip2Sequence.Element {
+	init?(first: Sequence1.Element?, second: Sequence2.Element?) {
+		switch (first, second) {
+		case let (first?, second?):
+			self = .pair(first: first, second: second)
+		case let (first?, nil):
+			self = .first(first)
+		case let (nil, second?):
+			self = .second(second)
+		default:
+			return nil
+		}
+	}
+}
+</code></pre><pre><code class="language-swift">
+public func safeZip&lt;Sequence1: Sequence, Sequence2: Sequence&gt;(_ sequence1: Sequence1, _ sequence2: Sequence2) -&gt; SafeZip2Sequence&lt;Sequence1, Sequence2&gt; {
+	return SafeZip2Sequence(sequence1: sequence1, sequence2: sequence2)
+}
+
+public func safeZip&lt;Sequence1, Sequence2&gt;(_ sequence1: Sequence1, _ sequence2: Sequence2, execute: (SafeZip2Sequence&lt;Sequence1, Sequence2&gt;.Element) -&gt; Void) {
+	for value in safeZip(sequence1, sequence2) {
+		execute(value)
+	}
+}
+</code></pre><pre><code class="language-swift">
+let labels = [UILabel()]
+let texts = ["a"]
+
+for element in safeZip(labels, texts) {
+	print(element)
+}
+</code></pre><pre><code class="language-swift">
+safeZip(labels, texts) { print($0) }
+					
+safeZip(labels, texts, execute: doSomething)
+</code></pre><pre><code class="language-swift">
+public extension Sequence {
+	func mySafeZip&lt;S: Sequence&gt;(_ sequence: S) -&gt; SafeZip2Sequence&lt;Self, S&gt; {
+		return safeZip(self, sequence)
+	}
+
+	func mySafeZip&lt;S: Sequence&gt;(_ sequence: S, execute: (SafeZip2Sequence&lt;Self, S&gt;.Element) -&gt; Void) {
+		return safeZip(self, sequence, execute: execute)
+	}
+}
+				</code></pre>
+</code></pre><pre><code class="language-js">
+module.exports = function(hljs) {
+  var SWIFT_KEYWORDS = {
+      keyword: '_ __COLUMN__ __FILE__ __FUNCTION__ __LINE__ as as! as? associativity ' +
+        'associatedtype break case catch class continue convenience default defer deinit didSet do ' +
+        'dynamic dynamicType else enum extension fallthrough false fileprivate final for func ' +
+        'get guard if import in indirect infix init inout internal is lazy left let ' +
+        'mutating nil none nonmutating open operator optional override postfix precedence ' +
+        'prefix private protocol Protocol public repeat required rethrows return ' +
+        'right self set static struct subscript super switch throw throws true ' +
+        'try try! try? Type typealias unowned var weak where while willSet',
+      literal: 'true false nil',
+      built_in: 'abs advance alignof alignofValue anyGenerator assert assertionFailure ' +
+        'bridgeFromObjectiveC bridgeFromObjectiveCUnconditional bridgeToObjectiveC ' +
+        'bridgeToObjectiveCUnconditional c contains count countElements countLeadingZeros ' +
+        'debugPrint debugPrintln distance dropFirst dropLast dump Element encodeBitsAsWords ' +
+        'enumerate equal fatalError filter find getBridgedObjectiveCType getVaList ' +
+        'indices insertionSort isBridgedToObjectiveC isBridgedVerbatimToObjectiveC ' +
+        'isUniquelyReferenced isUniquelyReferencedNonObjC Iterator IteratorProtocol join lazy lexicographicalCompare ' +
+        'map max maxElement min minElement numericCast overlaps partition posix ' +
+        'precondition preconditionFailure print println quickSort readLine reduce reflect ' +
+        'reinterpretCast reverse roundUpToAlignment Sequence sizeof sizeofValue sort split ' +
+        'startsWith stride strideof strideofValue String swap toString transcode ' +
+        'underestimateCount unsafeAddressOf unsafeBitCast unsafeDowncast unsafeUnwrap ' +
+        'unsafeReflect withExtendedLifetime withObjectAtPlusZero withUnsafePointer ' +
+        'withUnsafePointerToObject withUnsafeMutablePointer withUnsafeMutablePointers ' +
+        'withUnsafePointer withUnsafePointers withVaList zip'
+    };
+
+  var BUILTIN_TYPE = {
+    className: 'built_in',
+    begin: '(UI|NS|CG)[A-Z][\\w\u00C0-\u02B8\']+'
+  };
+  var TYPE = {
+    className: 'type',
+    begin: '\\b[A-Z][\\w\u00C0-\u02B8\']*',
+    keywords: SWIFT_KEYWORDS,
+    relevance: 0,
+    contains: [
+      BUILTIN_TYPE
+    ]
+  };
+  var BLOCK_COMMENT = hljs.COMMENT(
+    '/\\*',
+    '\\*/',
+    {
+      contains: ['self']
+    }
+  );
+  var SUBST = {
+    className: 'subst',
+    begin: /\\\(/, end: '\\)',
+    keywords: SWIFT_KEYWORDS,
+    contains: [] // assigned later
+  };
+  var NUMBERS = {
+      className: 'number',
+      begin: '\\b(\\d[\\d_]*(\\.[\\deE_]+)?|0x[a-fA-F0-9_]+(\\.[a-fA-F0-9p_]+)?|0b[01_]+|0o[0-7_]+)\\b',
+      relevance: 0
+  };
+  var QUOTE_STRING_MODE = hljs.inherit(hljs.QUOTE_STRING_MODE, {
+    contains: [SUBST, hljs.BACKSLASH_ESCAPE]
+  });
+  SUBST.contains = [NUMBERS];
+
+  return {
+    keywords: SWIFT_KEYWORDS,
+    contains: [
+      QUOTE_STRING_MODE,
+      hljs.C_LINE_COMMENT_MODE,
+      BLOCK_COMMENT,
+      TYPE,
+      NUMBERS,
+      {
+        className: 'function',
+        beginKeywords: 'func', end: '{', excludeEnd: true,
+        contains: [
+          hljs.inherit(hljs.TITLE_MODE, {
+            begin: /[A-Za-z$_][0-9A-Za-z$_]*/
+          }),
+          {
+            begin: /</, end: />/
+          },
+          {
+            className: 'params',
+            begin: /\(/, end: /\)/, endsParent: true,
+            keywords: SWIFT_KEYWORDS,
+            contains: [
+              'self',
+              NUMBERS,
+              QUOTE_STRING_MODE,
+              hljs.C_BLOCK_COMMENT_MODE,
+              {begin: ':'} // relevance booster
+            ],
+            illegal: /["']/
+          }
+        ],
+        illegal: /\[|%/
+      },
+      {
+        className: 'class',
+        beginKeywords: 'struct protocol class extension enum',
+        keywords: SWIFT_KEYWORDS,
+        end: '\\{',
+        excludeEnd: true,
+        contains: [
+          hljs.inherit(hljs.TITLE_MODE, {begin: /[A-Za-z$_][\u00C0-\u02B80-9A-Za-z$_]*/}),
+          {
+            className: 'params',
+            begin: /\</, end: /\>/, endsParent: true,
+            keywords: SWIFT_KEYWORDS,
+            contains: [
+              'self',
+              NUMBERS,
+              TYPE,
+              QUOTE_STRING_MODE,
+              hljs.C_BLOCK_COMMENT_MODE,
+              {begin: ':'} // relevance booster
+            ],
+            illegal: /["':]/
+          }
+        ]
+      },
+      {
+        className: 'meta', // @attributes
+        begin: '(@warn_unused_result|@exported|@lazy|@noescape|' +
+                  '@NSCopying|@NSManaged|@objc|@convention|@required|' +
+                  '@noreturn|@IBAction|@IBDesignable|@IBInspectable|@IBOutlet|' +
+                  '@infix|@prefix|@postfix|@autoclosure|@testable|@available|' +
+                  '@nonobjc|@NSApplicationMain|@UIApplicationMain)'
+
+      },
+      {
+        beginKeywords: 'import', end: /$/,
+        contains: [hljs.C_LINE_COMMENT_MODE, BLOCK_COMMENT]
+      }
+    ]
+  };
+}
+				</code></pre>
+	</body>
+</html>

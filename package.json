@@ -1,0 +1,18 @@
+{
+  "name": "prism-swift-parser",
+  "version": "1.0.0",
+  "description": "Swift parser for Prism.js",
+  "main": "src/prism-swift.js",
+  "scripts": {
+    "test": "npm run build && open ./test",
+    "build": "npm run placeFile && npm run clear && npm run prepare",
+    "clear": "rm -r ./test && mkdir ./test",
+    "placeFile": "cp ./src/prism-swift.js ./node_modules/prismjs/components",
+    "prepare": "node ./helper/prepareTemplates.js ./templates ./test"
+  },
+  "author": "Jan Dammshäuser",
+  "license": "ISC",
+  "dependencies": {
+    "node-prismjs": "^0.1.1"
+  }
+}
